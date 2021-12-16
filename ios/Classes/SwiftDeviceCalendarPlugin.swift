@@ -1,4 +1,4 @@
-eimport Flutter
+import Flutter
 import UIKit
 import EventKit
 
@@ -212,7 +212,7 @@ public class SwiftDeviceCalendarPlugin: NSObject, FlutterPlugin {
 	*/
 	
     private func createCalendar(_ call: FlutterMethodCall, _ result: FlutterResult) {
-        try {
+        do {
             let arguments = call.arguments as! Dictionary<String, AnyObject>
             let calendar = EKCalendar(for: .event, eventStore: eventStore)
             calendar.title = arguments[calendarNameArgument] as! String
@@ -225,7 +225,7 @@ public class SwiftDeviceCalendarPlugin: NSObject, FlutterPlugin {
             let source = iCloud ?? `default` ?? local
             if (source != nil) {
                 calendar.source = source
-                try! eventStore.saveCalendar(calendar, commit: true)
+                try eventStore.saveCalendar(calendar, commit: true)
                 result(calendar.calendarIdentifier)
             } else {
                 result(FlutterError(code: self.genericError, message: "Local calendar was not found.", details: nil))
