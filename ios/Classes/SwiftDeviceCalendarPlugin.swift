@@ -212,7 +212,7 @@ public class SwiftDeviceCalendarPlugin: NSObject, FlutterPlugin {
 	*/
 	
     private func createCalendar(_ call: FlutterMethodCall, _ result: FlutterResult) {
-        do {
+        try {
             let arguments = call.arguments as! Dictionary<String, AnyObject>
             let calendar = EKCalendar(for: .event, eventStore: eventStore)
             calendar.title = arguments[calendarNameArgument] as! String
