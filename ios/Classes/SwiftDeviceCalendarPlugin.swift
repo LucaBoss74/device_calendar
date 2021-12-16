@@ -1,4 +1,4 @@
-import Flutter
+eimport Flutter
 import UIKit
 import EventKit
 
@@ -179,6 +179,7 @@ public class SwiftDeviceCalendarPlugin: NSObject, FlutterPlugin {
       return nil
     }
 
+	/*
     private func createCalendar(_ call: FlutterMethodCall, _ result: FlutterResult) {
         let arguments = call.arguments as! Dictionary<String, AnyObject>
         let calendar = EKCalendar.init(for: EKEntityType.event, eventStore: eventStore)
@@ -208,6 +209,35 @@ public class SwiftDeviceCalendarPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: self.genericError, message: error.localizedDescription, details: nil))
         }
     }
+	*/
+	
+    private func createCalendar(_ call: FlutterMethodCall, _ result: FlutterResult) {
+        do {
+            let arguments = call.arguments as! Dictionary<String, AnyObject>
+            let calendar = EKCalendar(for: .event, eventStore: eventStore)
+            calendar.title = arguments[calendarNameArgument] as! String
+            calendar.cgColor = UIColor.purple.cgColor
+
+            let `default` = eventStore.defaultCalendarForNewEvents?.source
+            let iCloud = eventStore.sources.first(where: { $0.title == "iCloud" }) // this is fragile, user can rename the source
+            let local = eventStore.sources.first(where: { $0.sourceType == .local })
+
+            let source = iCloud ?? `default` ?? local
+            if (source != nil) {
+                calendar.source = source
+                try! eventStore.saveCalendar(calendar, commit: true)
+                result(calendar.calendarIdentifier)
+            } else {
+                result(FlutterError(code: self.genericError, message: "Local calendar was not found.", details: nil))
+            }
+            
+            
+        } catch {
+            eventStore.reset()
+            result(FlutterError(code: self.genericError, message: error.localizedDescription, details: nil))
+        }
+        
+    }	
     
     private func retrieveCalendars(_ result: @escaping FlutterResult) {
         checkPermissionsThenExecute(permissionsGrantedAction: {
